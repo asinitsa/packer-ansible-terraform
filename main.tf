@@ -7,7 +7,7 @@ provider "aws" {
   region = "eu-central-1"
 }
 
-locals { }
+locals {}
 
 resource "tls_private_key" "deploy" {
   algorithm = "RSA"
@@ -19,9 +19,25 @@ resource "aws_key_pair" "deploy" {
   public_key = tls_private_key.deploy.public_key_openssh
 }
 
+resource "aws_ssm_parameter" "packer-key-private" {
+  name        = "/packer/ssh/private"
+  description = "Private ssh key"
+  type        = "SecureString"
+  value       = tls_private_key.deploy.private_key_pem
+  overwrite   = true
+}
+
+resource "aws_ssm_parameter" "packer-key-public" {
+  name        = "/packer/ssh/public"
+  description = "Public ssh key"
+  type        = "SecureString"
+  value       = tls_private_key.deploy.public_key_openssh
+  overwrite   = true
+}
+
 data "aws_ami" "latest-packer-ami" {
-  most_recent      = true
-  owners           = ["self"]
+  most_recent = true
+  owners      = ["self"]
 
   filter {
     name   = "tag:Name"
@@ -33,3 +49,4 @@ data "aws_ami" "latest-packer-ami" {
     values = ["ebs"]
   }
 }
+
