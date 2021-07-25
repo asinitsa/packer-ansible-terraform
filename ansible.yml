@@ -1,0 +1,61 @@
+- name: 'Provision Image'
+  hosts: default
+  become: true
+  remote_user: ubuntu
+
+  tasks:
+    - name: Update  apt packages
+      become: true
+      apt:
+        upgrade: no
+        update_cache: yes
+        cache_valid_time: 600
+
+    - name: install openssh-server
+      package:
+        name: 'openssh-server'
+        state: present
+
+    - name: install iptables-persistent
+      package:
+        name: 'iptables-persistent'
+        state: present
+
+    - name: Start service ssh, if not started
+      service:
+        name: ssh
+        state: started
+
+    - name: Enable service ssh, if not Enable
+      service:
+        name: ssh
+        enabled: yes
+
+    - name: Start service netfilter-persistent, if not started
+      service:
+        name: netfilter-persistent
+        state: started
+
+    - name: Enable service netfilter-persistent, if not Enable
+      service:
+        name: netfilter-persistent
+        enabled: yes
+
+    - name: Allow new incoming SYN packets on TCP port 22 (SSH).
+      iptables:
+        chain: INPUT
+        protocol: tcp
+        destination_port: 22
+        jump: ACCEPT
+        comment: Accept ony SSH connections.
+
+    - name: Set the policy for the INPUT chain to DROP
+      iptables:
+        chain: INPUT
+        policy: DROP
+
+    - name: Check iptables
+      shell: '/sbin/iptables-save'
+
+    - name: Save iptables
+      shell: '/sbin/iptables-save > /etc/iptables/rules.v4'

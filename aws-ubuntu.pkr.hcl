@@ -34,17 +34,8 @@ build {
   sources = [
     "source.amazon-ebs.ubuntu"
   ]
-  provisioner "shell" {
-    environment_vars = [
-      "FOO=hello world",
-    ]
-    inline = [
-      "echo Installing Redis",
-      "sleep 30",
-      "sudo apt-get update",
-      "sudo apt-get install -y redis-server",
-      "echo \"FOO is $FOO\" > example.txt",
-    ]
+  provisioner "ansible" {
+    playbook_file = "./ansible.yml"
   }
 }
 

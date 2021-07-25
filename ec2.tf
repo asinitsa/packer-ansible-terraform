@@ -1,4 +1,4 @@
-resource "aws_instance" "packer" {
+resource "aws_instance" "bastion" {
   ami                         = data.aws_ami.latest-packer-ami.image_id
   associate_public_ip_address = false
   availability_zone           = "${var.region}a"
@@ -11,7 +11,7 @@ resource "aws_instance" "packer" {
 
   vpc_security_group_ids = [module.vpc.default_security_group_id]
   tags = {
-    Name    = "learn-packer-instance"
+    Name    = "bastion-instance"
     Ansible = "true"
   }
 }
