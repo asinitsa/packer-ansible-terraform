@@ -9,7 +9,7 @@ resource "aws_instance" "bastion" {
   subnet_id                   = module.vpc.private_subnets[0]
   monitoring                  = false
 
-  vpc_security_group_ids = [module.vpc.default_security_group_id]
+  vpc_security_group_ids = [ aws_security_group.bastion.id ]
   tags = {
     Name    = "bastion-instance"
     Ansible = "true"
